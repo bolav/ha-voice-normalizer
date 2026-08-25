@@ -1,5 +1,7 @@
 """Tests for the phonetic spelling normalizer."""
 
+import unicodedata
+
 import pytest
 
 from ha_voice_normalizer import (
@@ -70,6 +72,47 @@ def test_norwegian_echo_variants(text: str) -> None:
 )
 def test_spelling_variants(text: str, expected: str) -> None:
     assert spell(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        # Norwegian Armed Forces extension to NATO.
+        ("stav Ægir", "æ"),
+        ("stav Ørnulf", "ø"),
+        ("stav Ågot", "å"),
+        # Civilian Norwegian spelling alphabet.
+        ("stav Ærlig", "æ"),
+        ("stav Østen", "ø"),
+        ("stav Åse", "å"),
+    ],
+)
+def test_norwegian_letters(text: str, expected: str) -> None:
+    assert spell(text) == expected
+
+
+def test_norwegian_letters_case_is_ignored() -> None:
+    assert spell("stav ÆGIR ØRNULF ÅGOT") == "æøå"
+    assert spell("stav ægir ørnulf ågot") == "æøå"
+
+
+def test_norwegian_letters_inside_a_word() -> None:
+    # "Ålesund" is the point of the whole feature: a name a transcriber mangles.
+    assert spell("stav Ågot Lima Ekko Sierra Uniform November Delta") == "ålesund"
+    assert spell("Fortell om stav Bravo Lima Ågot Bravo Ærlig Romeo") == "Fortell om blåbær"
+
+
+def test_norwegian_letters_accept_decomposed_input() -> None:
+    # Some transcribers emit NFD: "Å" as "A" + combining ring above.
+    composed = "stav Ågot Lima Ekko"
+    decomposed = unicodedata.normalize("NFD", composed)
+    assert decomposed != composed
+    assert spell(decomposed) == "åle"
+
+
+def test_decomposed_text_outside_a_span_is_untouched() -> None:
+    text = unicodedata.normalize("NFD", "slå på lyset på kjøkkenet")
+    assert spell(text) == text
 
 
 @pytest.mark.parametrize("text", ["stav X-ray", "stav Xray", "stav X ray", "stav x-Ray"])

@@ -6,13 +6,20 @@ sentence is never globally lowercased.
 """
 
 import re
+import unicodedata
 from dataclasses import dataclass
+
+# A letter is a base character plus any combining marks that decorate it. The
+# marks matter: "å" may arrive composed (U+00E5) or decomposed (a + U+030A), and
+# a combining mark is not a word character, so without this a decomposed "Ågot"
+# would tokenize as "A" + "got" and never match a code word.
+_LETTER = r"(?:[^\W\d_][\u0300-\u036f]*)"
 
 # A word is a run of letters (any alphabet, so Norwegian æ/ø/å work), optionally
 # joined by hyphens or apostrophes: "Zulu", "X-ray", "kjøkken-lyset".
 # Digits are deliberately excluded; number/symbol spelling is a separate concern.
 # The curly apostrophe is intentional: speech-to-text engines emit both.
-_WORD_RE = re.compile(r"[^\W\d_]+(?:[-'’][^\W\d_]+)*")  # noqa: RUF001
+_WORD_RE = re.compile(rf"{_LETTER}+(?:[-'’]{_LETTER}+)*")  # noqa: RUF001
 
 _SENTENCE_BREAK_RE = re.compile(r"[.!?;:\n]")
 
@@ -27,8 +34,13 @@ class Token:
 
     @property
     def key(self) -> str:
-        """Return the case-insensitive lookup key for this token."""
-        return self.text.casefold()
+        """Return the case-insensitive lookup key for this token.
+
+        NFC folds a decomposed "a + combining ring" into "å", so a code word
+        matches however the transcriber chose to encode it. Only the key is
+        normalized — ``text`` and the offsets still address the original string.
+        """
+        return unicodedata.normalize("NFC", self.text.casefold())
 
 
 def tokenize(text: str) -> list[Token]:

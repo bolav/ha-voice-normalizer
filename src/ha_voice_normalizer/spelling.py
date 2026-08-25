@@ -12,6 +12,7 @@ The engine knows letters, not brands: mapping ``zeekr`` to ``Zeekr`` is the job
 of :mod:`ha_voice_normalizer.aliases`.
 """
 
+import unicodedata
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -47,6 +48,9 @@ LETTER_VARIANTS: Mapping[str, tuple[str, ...]] = {
     "x": ("x-ray", "xray", "x ray"),
     "y": ("yankee",),
     "z": ("zulu",),
+    "æ": ("ægir", "ærlig"),
+    "ø": ("ørnulf", "østen"),
+    "å": ("ågot", "åse"),
 }
 """Letter -> accepted spoken variants.
 
@@ -54,6 +58,15 @@ The first entry is the official NATO code word. The extra entries are spellings
 a Norwegian STT engine actually produces ("Ekko", "Hotell", "Oskar", "Viktor")
 or common English variants. Every variant here is covered by a test; add new
 ones the same way instead of guessing at what Whisper might emit.
+
+NATO stops at Z, so æ/ø/å use the Norwegian Armed Forces extension (Ægir,
+Ørnulf, Ågot) as the canonical word, with the civilian spelling alphabet
+(Ærlig, Østen, Åse) accepted as an alternate — a speaker reaches for whichever
+one they know. They live after "z" because that is where they sit in the
+Norwegian alphabet.
+
+Lookup keys are casefolded *and* NFC-normalized, so a decomposed "A + combining
+ring" from a transcriber matches the composed "å" written here.
 """
 
 
@@ -128,12 +141,16 @@ def resolve_languages(language: str | None) -> tuple[str, ...]:
 def _build_letter_lookup(
     variants: Mapping[str, Iterable[str]],
 ) -> tuple[dict[str, str], int]:
-    """Return a variant -> letter lookup and the longest variant's word count."""
+    """Return a variant -> letter lookup and the longest variant's word count.
+
+    Keys are built exactly the way :attr:`Token.key` builds them, NFC included,
+    so both sides of the lookup agree on how "å" is spelled.
+    """
     lookup: dict[str, str] = {}
     max_words = 1
     for letter, spoken in variants.items():
         for variant in spoken:
-            key = " ".join(variant.casefold().split())
+            key = " ".join(unicodedata.normalize("NFC", variant.casefold()).split())
             lookup[key] = letter
             max_words = max(max_words, len(key.split(" ")))
     return lookup, max_words

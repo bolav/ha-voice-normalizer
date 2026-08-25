@@ -118,6 +118,29 @@ j  juliett, juliet        x  x-ray, xray, "x ray"
 Variants are added when they are actually observed — each one has a test.
 Guessing at what a transcriber might emit is how false positives get in.
 
+### Æ, Ø and Å
+
+NATO stops at Z, so the Norwegian letters use the Norwegian Armed Forces
+extension as the canonical code word, and accept the civilian spelling alphabet
+as an alternate — a speaker reaches for whichever one they know:
+
+```text
+æ  ægir, ærlig
+ø  ørnulf, østen
+å  ågot, åse
+```
+
+```text
+"stav Ågot Lima Ekko Sierra Uniform November Delta"  ->  "ålesund"
+"Fortell om stav Bravo Lima Ågot Bravo Ærlig Romeo"  ->  "Fortell om blåbær"
+```
+
+They sort after `z` in `LETTER_VARIANTS`, which is where they sit in the
+Norwegian alphabet. Lookup keys are casefolded *and* NFC-normalized, so a
+transcriber that emits a decomposed "a + combining ring" matches the composed
+"å" in the table. Only the lookup key is normalized — the text outside a
+decoded span still comes through exactly as it arrived.
+
 ### False-positive policy
 
 Predictable behaviour beats clever parsing for something that sits in front of

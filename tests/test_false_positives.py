@@ -21,6 +21,11 @@ from ha_voice_normalizer import normalize_text
         "Vi møtes på Hotel Bravo i november",
         "Papa og mamma spiller golf",
         "Whiskey er ikke min greie",
+        # The æ/ø/å code words are ordinary Norwegian words and a common name.
+        "Åse er ærlig",
+        "Vi reiser til Østen",
+        "Åse og Ørnulf kommer på besøk",
+        "det er ærlig talt for dyrt",
         # Ordinary house commands.
         "slå på lyset",
         "slå på kjøkkenlyset",
