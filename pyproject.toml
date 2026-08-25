@@ -1,0 +1,38 @@
+[project]
+name = "ha-voice-normalizer"
+version = "0.1.0"
+description = "Home Assistant conversation agent that spells out difficult words"
+readme = "README.md"
+requires-python = ">=3.14.2"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "hassil",
+  "home-assistant-intents",
+  "homeassistant",
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+  "pytest-homeassistant-custom-component",
+  "pytest-timeout",
+  "pytest-xdist",
+  "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["B", "C4", "D", "E", "F", "I", "N", "PT", "RET", "RUF", "SIM", "UP", "W"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = ["--quiet", "--timeout=60", "--strict-markers"]
