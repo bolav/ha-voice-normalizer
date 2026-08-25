@@ -47,7 +47,7 @@ LETTER_VARIANTS: Mapping[str, tuple[str, ...]] = {
     "w": ("whiskey", "whisky"),
     "x": ("x-ray", "xray", "x ray"),
     "y": ("yankee",),
-    "z": ("zulu",),
+    "z": ("zulu", "sulu"),
     "æ": ("ægir", "ærlig"),
     "ø": ("ørnulf", "østen"),
     "å": ("ågot", "åse"),

@@ -72,6 +72,9 @@ def test_norwegian_echo_variants(text: str) -> None:
         # Whisper clips the second syllable of "Sierra" in Norwegian speech.
         ("stav Sera", "s"),
         ("stav Serah", "s"),
+        ("stav Zulu", "z"),
+        # Norwegian has no voiced /z/, so a spoken "Zulu" transcribes as "Sulu".
+        ("stav Sulu", "z"),
     ],
 )
 def test_spelling_variants(text: str, expected: str) -> None:
