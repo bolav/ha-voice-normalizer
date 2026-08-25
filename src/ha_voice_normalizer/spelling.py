@@ -40,7 +40,7 @@ LETTER_VARIANTS: Mapping[str, tuple[str, ...]] = {
     "p": ("papa",),
     "q": ("quebec",),
     "r": ("romeo",),
-    "s": ("sierra",),
+    "s": ("sierra", "sera", "serah"),
     "t": ("tango",),
     "u": ("uniform",),
     "v": ("victor", "viktor"),

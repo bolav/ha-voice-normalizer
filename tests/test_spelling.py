@@ -68,6 +68,10 @@ def test_norwegian_echo_variants(text: str) -> None:
         ("stav Whisky", "w"),
         ("stav Juliett", "j"),
         ("stav Juliet", "j"),
+        ("stav Sierra", "s"),
+        # Whisper clips the second syllable of "Sierra" in Norwegian speech.
+        ("stav Sera", "s"),
+        ("stav Serah", "s"),
     ],
 )
 def test_spelling_variants(text: str, expected: str) -> None:
