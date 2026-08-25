@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Voice Normalizer",
+        "description": "Voice Normalizer cleans up speech-to-text output and passes the result to another conversation agent, which produces the actual answer.",
+        "data": {
+          "name": "Name",
+          "downstream_agent": "Downstream conversation agent",
+          "spelling": "Phonetic spelling",
+          "spelling_mode": "Spelling mode",
+          "language": "Language",
+          "aliases": "Alias normalization",
+          "alias_table": "Aliases",
+          "corrections": "Known speech-to-text corrections",
+          "correction_table": "Corrections",
+          "log_text": "Log request text"
+        },
+        "data_description": {
+          "downstream_agent": "The agent that answers the normalized request.",
+          "spelling": "Decode dictated NATO letters, for example 'stav Zulu Ekko Ekko Kilo Romeo' into 'zeekr'.",
+          "spelling_mode": "Strict only rewrites a spelled span when the whole span is understood.",
+          "language": "Which spelling trigger words to listen for. Auto enables all of them.",
+          "alias_table": "One 'spoken form: canonical form' per line, for example 'zeekr: Zeekr'.",
+          "correction_table": "One 'misheard phrase: intended phrase' per line.",
+          "log_text": "Include the request text in debug logs. Off by default for privacy."
+        }
+      }
+    },
+    "error": {
+      "self_reference": "A normalizer cannot delegate to itself. Choose another conversation agent.",
+      "agent_not_found": "That conversation agent is not available."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Voice Normalizer settings",
+        "data": {
+          "downstream_agent": "Downstream conversation agent",
+          "spelling": "Phonetic spelling",
+          "spelling_mode": "Spelling mode",
+          "language": "Language",
+          "aliases": "Alias normalization",
+          "alias_table": "Aliases",
+          "corrections": "Known speech-to-text corrections",
+          "correction_table": "Corrections",
+          "log_text": "Log request text"
+        },
+        "data_description": {
+          "downstream_agent": "The agent that answers the normalized request.",
+          "spelling": "Decode dictated NATO letters, for example 'stav Zulu Ekko Ekko Kilo Romeo' into 'zeekr'.",
+          "spelling_mode": "Strict only rewrites a spelled span when the whole span is understood.",
+          "language": "Which spelling trigger words to listen for. Auto enables all of them.",
+          "alias_table": "One 'spoken form: canonical form' per line, for example 'zeekr: Zeekr'.",
+          "correction_table": "One 'misheard phrase: intended phrase' per line.",
+          "log_text": "Include the request text in debug logs. Off by default for privacy."
+        }
+      }
+    },
+    "error": {
+      "self_reference": "A normalizer cannot delegate to itself. Choose another conversation agent.",
+      "agent_not_found": "That conversation agent is not available."
+    }
+  },
+  "selector": {
+    "spelling_mode": {
+      "options": {
+        "strict": "Strict (recommended)",
+        "partial": "Partial"
+      }
+    },
+    "language": {
+      "options": {
+        "auto": "Auto",
+        "nb": "Norwegian",
+        "en": "English"
+      }
+    }
+  }
+}

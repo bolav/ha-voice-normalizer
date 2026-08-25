@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Legg til Voice Normalizer",
+        "description": "Voice Normalizer rydder opp i teksten fra tale-til-tekst og sender resultatet videre til en annen samtaleagent, som gir selve svaret.",
+        "data": {
+          "name": "Navn",
+          "downstream_agent": "Samtaleagent som svarer",
+          "spelling": "Fonetisk staving",
+          "spelling_mode": "Stavemodus",
+          "language": "Språk",
+          "aliases": "Aliasnormalisering",
+          "alias_table": "Alias",
+          "corrections": "Kjente tale-til-tekst-rettelser",
+          "correction_table": "Rettelser",
+          "log_text": "Logg teksten i forespørselen"
+        },
+        "data_description": {
+          "downstream_agent": "Agenten som svarer på den normaliserte forespørselen.",
+          "spelling": "Tolk dikterte NATO-bokstaver, for eksempel «stav Zulu Ekko Ekko Kilo Romeo» til «zeekr».",
+          "spelling_mode": "Streng modus endrer bare tekst når hele stavesekvensen er forstått.",
+          "language": "Hvilke utløserord for staving som gjelder. Auto slår på alle.",
+          "alias_table": "Én «uttalt form: kanonisk form» per linje, for eksempel «zeekr: Zeekr».",
+          "correction_table": "Én «feilhørt frase: riktig frase» per linje.",
+          "log_text": "Ta med teksten i feilsøkingsloggen. Av som standard av personvernhensyn."
+        }
+      }
+    },
+    "error": {
+      "self_reference": "En normaliserer kan ikke sende til seg selv. Velg en annen samtaleagent.",
+      "agent_not_found": "Denne samtaleagenten er ikke tilgjengelig."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Innstillinger for Voice Normalizer",
+        "data": {
+          "downstream_agent": "Samtaleagent som svarer",
+          "spelling": "Fonetisk staving",
+          "spelling_mode": "Stavemodus",
+          "language": "Språk",
+          "aliases": "Aliasnormalisering",
+          "alias_table": "Alias",
+          "corrections": "Kjente tale-til-tekst-rettelser",
+          "correction_table": "Rettelser",
+          "log_text": "Logg teksten i forespørselen"
+        },
+        "data_description": {
+          "downstream_agent": "Agenten som svarer på den normaliserte forespørselen.",
+          "spelling": "Tolk dikterte NATO-bokstaver, for eksempel «stav Zulu Ekko Ekko Kilo Romeo» til «zeekr».",
+          "spelling_mode": "Streng modus endrer bare tekst når hele stavesekvensen er forstått.",
+          "language": "Hvilke utløserord for staving som gjelder. Auto slår på alle.",
+          "alias_table": "Én «uttalt form: kanonisk form» per linje, for eksempel «zeekr: Zeekr».",
+          "correction_table": "Én «feilhørt frase: riktig frase» per linje.",
+          "log_text": "Ta med teksten i feilsøkingsloggen. Av som standard av personvernhensyn."
+        }
+      }
+    },
+    "error": {
+      "self_reference": "En normaliserer kan ikke sende til seg selv. Velg en annen samtaleagent.",
+      "agent_not_found": "Denne samtaleagenten er ikke tilgjengelig."
+    }
+  },
+  "selector": {
+    "spelling_mode": {
+      "options": {
+        "strict": "Streng (anbefalt)",
+        "partial": "Delvis"
+      }
+    },
+    "language": {
+      "options": {
+        "auto": "Auto",
+        "nb": "Norsk",
+        "en": "Engelsk"
+      }
+    }
+  }
+}

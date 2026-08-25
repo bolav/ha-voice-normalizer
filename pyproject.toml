@@ -1,10 +1,33 @@
 [project]
 name = "ha-voice-normalizer"
 version = "0.1.0"
-description = "Home Assistant conversation agent that spells out difficult words"
+description = "Deterministic speech-to-text normalization (phonetic spelling) for Home Assistant"
 readme = "README.md"
 requires-python = ">=3.14.2"
+license = "MIT"
+authors = [{ name = "Bjørn-Olav Strand", email = "bolav@ikke.no" }]
+keywords = ["home-assistant", "speech-to-text", "nato", "phonetic", "normalization"]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/bolav/ha-voice-normalizer"
+Issues = "https://github.com/bolav/ha-voice-normalizer/issues"
+
+[project.scripts]
+ha-voice-normalizer = "ha_voice_normalizer.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ha_voice_normalizer"]
+
+[tool.uv]
+# The build backend above exists so the core can be published to PyPI, but uv
+# must not install this project into the dev environment: the sandboxed dev
+# container has no network and tests import the core straight from src/.
+package = false
 
 [dependency-groups]
 dev = [
@@ -30,9 +53,12 @@ select = ["B", "C4", "D", "E", "F", "I", "N", "PT", "RET", "RUF", "SIM", "UP", "
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D103"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-pythonpath = ["."]
+pythonpath = [".", "src"]
 testpaths = ["tests"]
 addopts = ["--quiet", "--timeout=60", "--strict-markers"]

@@ -1,0 +1,13 @@
+{
+  "domain": "voice_normalizer",
+  "name": "Voice Normalizer",
+  "codeowners": ["@bolav"],
+  "config_flow": true,
+  "dependencies": ["conversation"],
+  "documentation": "https://github.com/bolav/ha-voice-normalizer",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/bolav/ha-voice-normalizer/issues",
+  "requirements": ["ha-voice-normalizer==0.1.0"],
+  "version": "0.1.0"
+}
