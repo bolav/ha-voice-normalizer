@@ -2,7 +2,7 @@
 
 import pytest
 
-from ha_voice_normalizer import (
+from custom_components.voice_normalizer.ha_voice_normalizer import (
     AliasNormalizer,
     NormalizationPipeline,
     NormalizationResult,
@@ -11,7 +11,7 @@ from ha_voice_normalizer import (
     SttCorrectionNormalizer,
     normalize_text,
 )
-from ha_voice_normalizer.__main__ import main
+from custom_components.voice_normalizer.ha_voice_normalizer.__main__ import main
 
 
 def test_readme_example() -> None:

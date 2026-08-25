@@ -70,9 +70,7 @@ class NormalizationResult:
         """Return whether the text differs from the original text."""
         return self.text != self.original_text
 
-    def applied(
-        self, text: str, operations: list[NormalizationOperation]
-    ) -> NormalizationResult:
+    def applied(self, text: str, operations: list[NormalizationOperation]) -> NormalizationResult:
         """Return a new result with ``text`` and ``operations`` appended.
 
         The original result is left untouched, so normalizers stay side-effect

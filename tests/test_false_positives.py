@@ -7,7 +7,7 @@ unchanged.
 
 import pytest
 
-from ha_voice_normalizer import normalize_text
+from custom_components.voice_normalizer.ha_voice_normalizer import normalize_text
 
 
 @pytest.mark.parametrize(

@@ -39,7 +39,8 @@ Spelling is decoded by deterministic code, never by an LLM. An LLM guessing
 | Home Assistant integration | A conversation agent that normalizes and delegates to another agent |
 | Inside `ha-voice-router` | The same library, imported by the router (future) |
 
-The normalization core lives in `src/ha_voice_normalizer/` and knows nothing
+The normalization core lives in
+`custom_components/voice_normalizer/ha_voice_normalizer/` and knows nothing
 about Home Assistant. The integration in `custom_components/voice_normalizer/`
 is one adapter on top of it and contains no spelling logic of its own.
 
@@ -106,7 +107,7 @@ Norwegian letters, and spacing are all preserved.
 ### Norwegian STT variants
 
 Every accepted spoken form is listed in `LETTER_VARIANTS` in
-[`spelling.py`](src/ha_voice_normalizer/spelling.py), with the official NATO
+[`spelling.py`](custom_components/voice_normalizer/ha_voice_normalizer/spelling.py), with the official NATO
 word first:
 
 ```text
@@ -210,12 +211,15 @@ Behaviour worth knowing:
 
 ### Setup
 
-The integration needs two things on the Home Assistant side: the component in
-`config/custom_components/`, and the `ha_voice_normalizer` core library
-importable. The library is not on PyPI, so `manifest.json` declares no
-requirements at all and both are placed by hand, from one clone.
+The component carries the core library inside it, so there is nothing to
+install and nothing to fetch: `manifest.json` declares no requirements.
 
-From the *Terminal & SSH* add-on, or its sidebar web terminal:
+**HACS.** ⋮ → *Custom repositories* → this repository, type **Integration** →
+Download. HACS resolves a repository to its latest GitHub *release*; with no
+release published it falls back to the head commit and then asks GitHub for it
+as a branch, which 404s. Publish a release before installing this way.
+
+**Without HACS**, from the *Terminal & SSH* add-on or its sidebar web terminal:
 
 ```sh
 git clone https://github.com/bolav/ha-voice-normalizer /config/ha-voice-normalizer
@@ -223,51 +227,16 @@ git clone https://github.com/bolav/ha-voice-normalizer /config/ha-voice-normaliz
 mkdir -p /config/custom_components
 ln -s /config/ha-voice-normalizer/custom_components/voice_normalizer \
       /config/custom_components/voice_normalizer
-
-# Home Assistant mounts config/deps onto sys.path whenever it is not running in
-# a virtualenv, which is the case in the Home Assistant OS container. Match the
-# Python version under Settings -> System -> Repairs -> System information.
-mkdir -p /config/deps/lib/python3.14/site-packages
-ln -s /config/ha-voice-normalizer/src/ha_voice_normalizer \
-      /config/deps/lib/python3.14/site-packages/ha_voice_normalizer
 ```
 
-Then:
+The symlink points into the clone, so `git pull` plus a restart is the update.
+
+Either way:
 
 1. Restart Home Assistant.
 2. *Settings → Devices & Services → Add integration → Voice Normalizer*.
 3. Pick the downstream conversation agent, then select Voice Normalizer as the
    conversation agent of your Assist pipeline.
-
-Both symlinks point into the same clone, so `git pull` followed by a restart
-updates the component and the library together, and nothing is fetched at boot.
-A Home Assistant OS upgrade that moves to a new Python minor version needs the
-`deps` directory re-created; that failure is a loud `ImportError` in the log,
-not silent breakage.
-
-#### HACS
-
-HACS installs the component directory but never the core library, so it needs
-`manifest.json` to name a requirement Home Assistant can resolve. Until the
-library is published to PyPI that means pointing the requirement at this
-repository:
-
-```json
-"requirements": [
-  "git+https://github.com/bolav/ha-voice-normalizer@main#ha-voice-normalizer==0.1.0"
-]
-```
-
-The fragment spelling matters. Home Assistant's `is_installed()` treats any
-requirement carrying a PEP 508 URL as never satisfied, so `name @ git+https://…`
-would re-clone and rebuild on every restart; with the fragment the
-installed-check parses `ha-voice-normalizer==0.1.0` and the fetch happens once.
-Note that `tool.uv.package = false` in `pyproject.toml` may stop uv from
-building the project from a git source — verify with
-`uv pip install --dry-run` before relying on this.
-
-Once the library is on PyPI the requirement becomes a plain
-`ha-voice-normalizer==0.1.0` and HACS works with no caveats.
 
 Everything is configurable from the UI, before and after setup: downstream
 agent, spelling on/off, strict/partial, language, alias table, correction
@@ -303,24 +272,32 @@ correction tables are redacted, and transcripts are never included.
 
 ## Packaging
 
-The repository is a monorepo holding both halves:
+The repository holds both halves, with the core nested inside the integration:
 
 ```text
-src/ha_voice_normalizer/            the standalone library (published to PyPI)
-custom_components/voice_normalizer/ the Home Assistant integration (HACS)
+custom_components/voice_normalizer/                     the integration (HACS)
+custom_components/voice_normalizer/ha_voice_normalizer/ the core (published to PyPI)
 ```
 
-HACS installs only the `custom_components/voice_normalizer/` directory, so the
-integration pulls the core in the normal Home Assistant way — through
-`requirements` in `manifest.json`. **That means the core must be published to
-PyPI before the first HACS release**; until then, install the library into the
-Home Assistant environment yourself (`pip install .`), or run Home Assistant
-with `src/` on `PYTHONPATH` and `--skip-pip`.
+HACS copies only `custom_components/voice_normalizer/`, and nothing else. With
+the core nested inside it, that one copy carries the library too: `manifest.json`
+declares no requirements, so a HACS install needs no PyPI package, no pip, no
+build backend and no network at boot.
 
-The alternative would be vendoring a copy of the core inside the custom
-component, which removes the PyPI dependency but duplicates the code that both
-`ha-voice-router` and library users are meant to share. Keeping one copy is
-worth one release step.
+There is still exactly one copy of the core. `[tool.hatch.build.targets.wheel]`
+points at the nested directory, so the wheel published to PyPI exposes it as a
+top-level `ha_voice_normalizer` exactly as before, and `ha-voice-router` can
+depend on it normally. Only the path inside this repository changed.
+
+The cost is that the core's own tests import it by its in-repo path
+(`custom_components.voice_normalizer.ha_voice_normalizer`), and running the CLI
+from a checkout needs that path too:
+
+```sh
+python -m custom_components.voice_normalizer.ha_voice_normalizer --language nb "stav Alfa Bravo"
+```
+
+Installed from PyPI, it is plain `python -m ha_voice_normalizer`.
 
 ## Development
 
@@ -330,8 +307,7 @@ uv run pytest
 uv run ruff check .
 ```
 
-Tests import the core straight from `src/` (see `pythonpath` in
-`pyproject.toml`), and the Home Assistant tests under `tests/integration/` run
+Tests import the core by its in-repo path, and the Home Assistant tests under `tests/integration/` run
 against a real Home Assistant instance with a mock downstream agent.
 
 The test suite covers the normalization core at 100%: basic decoding, casing,

@@ -137,8 +137,6 @@ def normalizer_entity_id(hass: HomeAssistant, entry: MockConfigEntry) -> str:
 
 
 @pytest.fixture
-async def normalizer(
-    hass: HomeAssistant, downstream: MockConversationAgent
-) -> MockConfigEntry:
+async def normalizer(hass: HomeAssistant, downstream: MockConversationAgent) -> MockConfigEntry:
     """Set up a normalizer delegating to the mock downstream agent."""
     return await setup_normalizer(hass, downstream.agent_id)

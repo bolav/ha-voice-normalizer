@@ -25,8 +25,6 @@ from homeassistant.helpers.selector import (
     TextSelectorConfig,
 )
 
-from ha_voice_normalizer import SpellingMode
-
 from .const import (
     CONF_ALIAS_TABLE,
     CONF_ALIASES,
@@ -41,6 +39,7 @@ from .const import (
     LANGUAGE_AUTO,
     LANGUAGE_OPTIONS,
 )
+from .ha_voice_normalizer import SpellingMode
 
 DEFAULT_OPTIONS: Mapping[str, Any] = {
     CONF_LANGUAGE: LANGUAGE_AUTO,

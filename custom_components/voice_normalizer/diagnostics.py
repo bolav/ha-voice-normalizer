@@ -12,9 +12,7 @@ from homeassistant.const import CONF_LANGUAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_integration
 
-import ha_voice_normalizer
-
-from . import VoiceNormalizerConfigEntry
+from . import VoiceNormalizerConfigEntry, ha_voice_normalizer
 from .const import (
     CONF_ALIAS_TABLE,
     CONF_ALIASES,

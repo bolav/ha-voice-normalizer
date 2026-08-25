@@ -2,7 +2,7 @@
 
 import pytest
 
-from ha_voice_normalizer import (
+from custom_components.voice_normalizer.ha_voice_normalizer import (
     OP_ALIAS,
     OP_STT_CORRECTION,
     AliasNormalizer,

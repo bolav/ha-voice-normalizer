@@ -9,8 +9,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from ha_voice_normalizer import NormalizationPipeline, SpellingMode, parse_phrase_lines
-
 from .const import (
     CONF_ALIAS_TABLE,
     CONF_ALIASES,
@@ -20,6 +18,7 @@ from .const import (
     CONF_SPELLING_MODE,
     LANGUAGE_AUTO,
 )
+from .ha_voice_normalizer import NormalizationPipeline, SpellingMode, parse_phrase_lines
 
 
 def build_pipeline(options: Mapping[str, Any], language: str) -> NormalizationPipeline:
@@ -29,9 +28,7 @@ def build_pipeline(options: Mapping[str, Any], language: str) -> NormalizationPi
     spelling triggers.
     """
     aliases = (
-        parse_phrase_lines(options.get(CONF_ALIAS_TABLE, ""))
-        if options.get(CONF_ALIASES)
-        else None
+        parse_phrase_lines(options.get(CONF_ALIAS_TABLE, "")) if options.get(CONF_ALIASES) else None
     )
     corrections = (
         parse_phrase_lines(options.get(CONF_CORRECTION_TABLE, ""))

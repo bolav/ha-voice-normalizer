@@ -68,9 +68,7 @@ def apply_phrases(
 def normalize_phrase_table(phrases: Mapping[str, str]) -> dict[str, str]:
     """Return ``phrases`` with casefolded, whitespace-collapsed keys."""
     return {
-        " ".join(key.casefold().split()): value
-        for key, value in phrases.items()
-        if key.strip()
+        " ".join(key.casefold().split()): value for key, value in phrases.items() if key.strip()
     }
 
 

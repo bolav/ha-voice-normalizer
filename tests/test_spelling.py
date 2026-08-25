@@ -4,7 +4,7 @@ import unicodedata
 
 import pytest
 
-from ha_voice_normalizer import (
+from custom_components.voice_normalizer.ha_voice_normalizer import (
     OP_PHONETIC_SPELLING,
     NormalizationResult,
     SpellingMode,
@@ -12,7 +12,7 @@ from ha_voice_normalizer import (
     normalize_spelling,
     normalize_text,
 )
-from ha_voice_normalizer.spelling import resolve_languages
+from custom_components.voice_normalizer.ha_voice_normalizer.spelling import resolve_languages
 
 
 def spell(text: str, language: str | None = "nb") -> str:

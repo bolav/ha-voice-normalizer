@@ -253,9 +253,7 @@ class SpellingNormalizer:
             index = next_index
         return spans
 
-    def _read_letters(
-        self, text: str, tokens: list[Token], start: int
-    ) -> tuple[list[str], int]:
+    def _read_letters(self, text: str, tokens: list[Token], start: int) -> tuple[list[str], int]:
         """Read the run of code words starting at ``start``.
 
         Returns the decoded letters and the index of the first token that is not
@@ -272,9 +270,7 @@ class SpellingNormalizer:
             index += length
         return letters, index
 
-    def _match_variant(
-        self, text: str, tokens: list[Token], index: int
-    ) -> tuple[str, int] | None:
+    def _match_variant(self, text: str, tokens: list[Token], index: int) -> tuple[str, int] | None:
         """Return the letter and token count of the code word at ``index``.
 
         Longer code words win, so "x ray" is preferred over a bare "x".
@@ -285,9 +281,7 @@ class SpellingNormalizer:
                 return letter, length
         return None
 
-    def _variant_key(
-        self, text: str, tokens: list[Token], index: int, length: int
-    ) -> str | None:
+    def _variant_key(self, text: str, tokens: list[Token], index: int, length: int) -> str | None:
         """Return the lookup key for ``length`` tokens starting at ``index``.
 
         Multi-word code words ("x ray") only match when nothing but whitespace

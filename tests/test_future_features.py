@@ -7,7 +7,7 @@ the tests cannot quietly drift apart.
 
 import pytest
 
-from ha_voice_normalizer import normalize_text
+from custom_components.voice_normalizer.ha_voice_normalizer import normalize_text
 
 pytestmark = pytest.mark.xfail(strict=True, reason="planned, see the roadmap in README.md")
 

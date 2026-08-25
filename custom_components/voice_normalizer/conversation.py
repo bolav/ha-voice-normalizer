@@ -16,11 +16,9 @@ from homeassistant.helpers import intent
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-import ha_voice_normalizer
-from ha_voice_normalizer import NormalizationResult
-
-from . import VoiceNormalizerConfigEntry
+from . import VoiceNormalizerConfigEntry, ha_voice_normalizer
 from .const import CONF_DOWNSTREAM_AGENT, CONF_LOG_TEXT, DOMAIN, LOGGER
+from .ha_voice_normalizer import NormalizationResult
 
 _ACTIVE_NORMALIZERS: ContextVar[frozenset[str]] = ContextVar(
     "voice_normalizer_active", default=frozenset()

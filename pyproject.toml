@@ -21,12 +21,15 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ha_voice_normalizer"]
+# The core lives inside the custom component so that a HACS install, which
+# copies only custom_components/voice_normalizer/, ships the library with it.
+# The wheel published to PyPI still exposes it as a top-level ha_voice_normalizer.
+packages = ["custom_components/voice_normalizer/ha_voice_normalizer"]
 
 [tool.uv]
 # The build backend above exists so the core can be published to PyPI, but uv
 # must not install this project into the dev environment: the sandboxed dev
-# container has no network and tests import the core straight from src/.
+# container has no network and tests import the core straight from the tree.
 package = false
 
 [dependency-groups]
@@ -63,6 +66,6 @@ convention = "google"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-pythonpath = [".", "src"]
+pythonpath = ["."]
 testpaths = ["tests"]
 addopts = ["--quiet", "--timeout=60", "--strict-markers"]
