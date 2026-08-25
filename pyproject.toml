@@ -32,6 +32,10 @@ package = false
 [dependency-groups]
 dev = [
   "hassil",
+  # Pinned to what this Home Assistant version's frontend component asks for.
+  # Without it Home Assistant boots into recovery mode, which serves no UI and
+  # loads no custom integrations, so `hass -c .ha` cannot exercise this repo.
+  "home-assistant-frontend==20260729.7",
   "home-assistant-intents",
   "homeassistant",
   "pytest",
