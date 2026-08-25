@@ -60,20 +60,22 @@ def _options_schema(defaults: Mapping[str, Any]) -> vol.Schema:
     def default(key: str) -> Any:
         return defaults.get(key, DEFAULT_OPTIONS.get(key))
 
-    downstream = default(CONF_DOWNSTREAM_AGENT)
-    downstream_field = (
-        vol.Required(CONF_DOWNSTREAM_AGENT, default=downstream)
-        if downstream
-        else vol.Required(CONF_DOWNSTREAM_AGENT)
+    # The default must be present even when there is nothing to pre-fill. For a
+    # required field with no default the frontend derives an initial value from
+    # the selector type, and it has no rule for conversation_agent: it raises
+    # "Selector conversation_agent not supported in initial form data" and the
+    # dialog renders with no fields at all, silently — nothing reaches the Home
+    # Assistant log. An empty string keeps the field out of that path, and
+    # _validate turns it into a visible error.
+    downstream_field = vol.Required(
+        CONF_DOWNSTREAM_AGENT, default=default(CONF_DOWNSTREAM_AGENT) or ""
     )
 
     return vol.Schema(
         {
             downstream_field: ConversationAgentSelector(ConversationAgentSelectorConfig()),
             vol.Required(CONF_SPELLING, default=default(CONF_SPELLING)): BooleanSelector(),
-            vol.Required(
-                CONF_SPELLING_MODE, default=default(CONF_SPELLING_MODE)
-            ): SelectSelector(
+            vol.Required(CONF_SPELLING_MODE, default=default(CONF_SPELLING_MODE)): SelectSelector(
                 SelectSelectorConfig(
                     options=[mode.value for mode in SpellingMode],
                     mode=SelectSelectorMode.DROPDOWN,
@@ -89,12 +91,10 @@ def _options_schema(defaults: Mapping[str, Any]) -> vol.Schema:
                 )
             ),
             vol.Required(CONF_ALIASES, default=default(CONF_ALIASES)): BooleanSelector(),
-            vol.Optional(
-                CONF_ALIAS_TABLE, default=default(CONF_ALIAS_TABLE)
-            ): TextSelector(TextSelectorConfig(multiline=True)),
-            vol.Required(
-                CONF_CORRECTIONS, default=default(CONF_CORRECTIONS)
-            ): BooleanSelector(),
+            vol.Optional(CONF_ALIAS_TABLE, default=default(CONF_ALIAS_TABLE)): TextSelector(
+                TextSelectorConfig(multiline=True)
+            ),
+            vol.Required(CONF_CORRECTIONS, default=default(CONF_CORRECTIONS)): BooleanSelector(),
             vol.Optional(
                 CONF_CORRECTION_TABLE, default=default(CONF_CORRECTION_TABLE)
             ): TextSelector(TextSelectorConfig(multiline=True)),
@@ -117,7 +117,7 @@ def _validate(
     """Validate the submitted settings and return per-field errors."""
     agent_id = options.get(CONF_DOWNSTREAM_AGENT)
     if not agent_id:
-        return {CONF_DOWNSTREAM_AGENT: "agent_not_found"}
+        return {CONF_DOWNSTREAM_AGENT: "no_agent_selected"}
     if agent_id in own_entity_ids:
         # Delegating to ourselves would recurse until Home Assistant gives up.
         return {CONF_DOWNSTREAM_AGENT: "self_reference"}
@@ -135,9 +135,7 @@ class VoiceNormalizerConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Create a new normalizer instance."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -163,17 +161,13 @@ class VoiceNormalizerConfigFlow(ConfigFlow, domain=DOMAIN):
 class VoiceNormalizerOptionsFlow(OptionsFlow):
     """Handle option changes without recreating the integration."""
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Change the downstream agent and the enabled normalizers."""
         errors: dict[str, str] = {}
         defaults: dict[str, Any] = {**self.config_entry.data, **self.config_entry.options}
 
         if user_input is not None:
-            errors = _validate(
-                self.hass, user_input, _own_entity_ids(self.hass, self.config_entry)
-            )
+            errors = _validate(self.hass, user_input, _own_entity_ids(self.hass, self.config_entry))
             if not errors:
                 return self.async_create_entry(data=user_input)
             defaults = {**defaults, **user_input}

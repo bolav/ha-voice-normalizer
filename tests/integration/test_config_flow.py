@@ -2,10 +2,12 @@
 
 from typing import Any
 
+import voluptuous_serialize
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant.const import CONF_LANGUAGE, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.helpers import config_validation as cv
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.voice_normalizer.const import (
@@ -41,9 +43,7 @@ def user_input(agent_id: str, **overrides: Any) -> dict[str, Any]:
 
 
 async def test_user_flow(hass: HomeAssistant, downstream: MockConversationAgent) -> None:
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "user"
 
@@ -63,12 +63,40 @@ async def test_user_flow(hass: HomeAssistant, downstream: MockConversationAgent)
     assert downstream.last_call.text == NORMALIZED
 
 
+async def test_every_required_field_has_a_default(hass: HomeAssistant) -> None:
+    """The frontend must never have to invent an initial value for a field.
+
+    For a required field with neither a suggested value nor a default, the
+    frontend derives one from the selector type, and it has no rule for
+    conversation_agent: it raises "Selector conversation_agent not supported in
+    initial form data" and the dialog renders empty, with nothing in the Home
+    Assistant log to say why.
+    """
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    fields = voluptuous_serialize.convert(
+        result["data_schema"], custom_serializer=cv.custom_serializer
+    )
+
+    unseedable = [
+        field["name"] for field in fields if field.get("required") and "default" not in field
+    ]
+    assert unseedable == []
+
+
+async def test_user_flow_rejects_an_empty_agent(hass: HomeAssistant) -> None:
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input("", **{CONF_NAME: "Empty"})
+    )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_DOWNSTREAM_AGENT: "no_agent_selected"}
+
+
 async def test_user_flow_rejects_an_unknown_agent(
     hass: HomeAssistant, downstream: MockConversationAgent
 ) -> None:
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], user_input("conversation.nope", **{CONF_NAME: "Nope"})
     )
@@ -88,9 +116,7 @@ async def test_multiple_entries_are_allowed(
     hass: HomeAssistant, downstream: MockConversationAgent
 ) -> None:
     for name in ("First", "Second"):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": SOURCE_USER}
-        )
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input(downstream.agent_id, **{CONF_NAME: name})
         )

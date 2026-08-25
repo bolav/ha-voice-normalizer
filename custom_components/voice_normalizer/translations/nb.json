@@ -29,6 +29,7 @@
     },
     "error": {
       "self_reference": "En normaliserer kan ikke sende til seg selv. Velg en annen samtaleagent.",
+      "no_agent_selected": "Velg en samtaleagent å delegere til.",
       "agent_not_found": "Denne samtaleagenten er ikke tilgjengelig."
     }
   },
@@ -60,6 +61,7 @@
     },
     "error": {
       "self_reference": "En normaliserer kan ikke sende til seg selv. Velg en annen samtaleagent.",
+      "no_agent_selected": "Velg en samtaleagent å delegere til.",
       "agent_not_found": "Denne samtaleagenten er ikke tilgjengelig."
     }
   },

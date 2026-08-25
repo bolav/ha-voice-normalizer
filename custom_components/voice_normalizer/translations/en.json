@@ -29,6 +29,7 @@
     },
     "error": {
       "self_reference": "A normalizer cannot delegate to itself. Choose another conversation agent.",
+      "no_agent_selected": "Select a conversation agent to delegate to.",
       "agent_not_found": "That conversation agent is not available."
     }
   },
@@ -60,6 +61,7 @@
     },
     "error": {
       "self_reference": "A normalizer cannot delegate to itself. Choose another conversation agent.",
+      "no_agent_selected": "Select a conversation agent to delegate to.",
       "agent_not_found": "That conversation agent is not available."
     }
   },
